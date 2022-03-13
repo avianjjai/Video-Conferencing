@@ -4,9 +4,8 @@ from View.Camera import Camera
 from View.Video import Video
 import threading
 
-class VideoFrame(threading.Thread):
-    def __init__(self, master, width: float, height: float, top_left: Point, bg, videoType) -> None:
-        threading.Thread.__init__(self)
+class VideoFrame():
+    def __init__(self, master, width: float, height: float, top_left: Point, bg, videoType, CAMERA_PORT = None, CALLER_PORT = None, CALLER_IP = None) -> None:
         self.videoType = videoType
 
         # Name Frame
@@ -28,14 +27,16 @@ class VideoFrame(threading.Thread):
         )
         self.videoFrame = Canvas(**videoFrame)
         self.videoFrame.place(x=top_left.x, y=top_left.y + nameFrame['height'])
-        self.video = None
+        self.video = self.create(CAMERA_PORT, CALLER_IP, CALLER_PORT)
+        self.video.start()
+
+    def __del__(self):
+        self.video.stop()
 
 
-    def run(self):
+    def create(self, CAMERA_PORT, CALLER_IP, CALLER_PORT):
         if self.videoType == 'Camera':
-            self.video = Camera(self.videoFrame)
-            self.video.capture()
+            return Camera(self.videoFrame, CAMERA_PORT)
 
         elif self.videoType == 'Video':
-            self.video = Video(self.videoFrame)
-            self.video.capture()
+            return Video(self.videoFrame, CALLER_IP, CALLER_PORT)

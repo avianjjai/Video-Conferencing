@@ -1,9 +1,16 @@
-from tkinter import Canvas
+from tkinter import Button, Canvas
 from Model.Point import Point
 from View.VideoFrame import VideoFrame
+from Connection.Connection import makeCall
 
 class IDE:
-    def __init__(self, master, width: float, height: float, bg) -> None:
+    def __init__(self, master, width: float, height: float, bg, SERVER_IP, SERVER_PORT) -> None:
+        self.SERVER_PORT = SERVER_PORT
+        self.SERVER_IP = SERVER_IP
+
+        connection = makeCall(self.SERVER_IP, self.SERVER_PORT)
+        print(connection)
+
         self.master = master
         self.master.title("Video Conferencing")
         dim = str(width) + 'x' + str(height)
@@ -31,7 +38,7 @@ class IDE:
         # Video Frame Part: Mid
         videoFrameOuter = dict(
             master = self.canvas,
-            # bg = '#876354',
+            bg = '#876354',
             height = height*.6,
             width = width
         )
@@ -48,10 +55,10 @@ class IDE:
             width = (videoFrameOuter['width']-30)/2,
             top_left = Point(x = border['width'], y = border['width']),
             bg = '#784628',
-            videoType = 'Camera'
+            videoType = 'Camera',
+            CAMERA_PORT = connection['CAMERA_PORT']
         )
         self.videoFrame1 = VideoFrame(**videoFrame1)
-        self.videoFrame1.start()
 
         videoFrame2 = dict(
             master = self.videoFrameOuter,
@@ -59,21 +66,35 @@ class IDE:
             width = (videoFrameOuter['width']-30)/2,
             top_left = Point(x = videoFrame1['width'] + 2*border['width'], y = border['width']),
             bg = '#784628',
-            videoType = 'Video'
+            videoType = 'Video',
+            CALLER_PORT = connection['CALLER_PORT'],
+            CALLER_IP = connection['CALLER_IP']
         )
         self.videoFrame2 = VideoFrame(**videoFrame2)
-        self.videoFrame2.start()
 
         self.videoFrameOuter.pack()
 
         # Control Panel Part: Bottom
         controlPanel = dict(
             master = self.canvas,
-            bg = '#587354',
+            bg = '#969754',
             height = height*.2,
             width = width
         )
         self.controlPanel = Canvas(**controlPanel)
+
+        cutButton = dict(
+            master = self.controlPanel,
+            text = 'End',
+            command = self.endCall
+        )
+        self.cutButton = Button(**cutButton)
+        self.cutButton.pack()
+
         self.controlPanel.pack()
 
         self.canvas.pack()
+
+    def endCall(self):
+        del self.videoFrame1
+        del self.videoFrame2
