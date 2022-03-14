@@ -1,33 +1,39 @@
-import cv2
-from PIL import Image, ImageTk
-from tkinter import NW
+import pyaudio
 import threading
-import time
 import socket
-import pickle
 import struct
+import pickle
+import numpy as np
 
-class Video(threading.Thread):
-    def __init__(self, videoFrame, SERVER_IP, SERVER_PORT, endCall) -> None:
+class Speaker(threading.Thread):
+    def __init__(self, frame_size, SERVER_IP, SERVER_PORT, endCall):
         threading.Thread.__init__(self)
         self._stop = threading.Event()
         self.endCall = endCall
         self.SERVER_PORT = SERVER_PORT
         self.SERVER_IP = SERVER_IP
         self.SERVER_SOCKET = None
-        self.img = None
-        self.videoFrame = videoFrame
+
+        attr = dict(
+            format = pyaudio.paInt16,
+            channels = 1,
+            rate = frame_size,
+            output = True
+        )
+
+        self.obj = pyaudio.PyAudio()
+        self.stream = self.obj.open(**attr)
 
     def stop(self):
         self._stop.set()
-
+    
     def stopped(self):
         return self._stop.isSet()
 
+    def play(self, sound):
+        self.stream.write(sound.tobytes())
 
     def run(self):
-        # time.sleep(2)
-
         print(self.SERVER_IP, self.SERVER_PORT)
 
         ######################################################################
@@ -56,15 +62,11 @@ class Video(threading.Thread):
                 recv = recv[msg_size: ]
                 
                 data = pickle.loads(frame_data)
-                img = data['payload']
-                img = cv2.resize(img, (int(self.videoFrame.cget('width')), int(self.videoFrame.cget('height'))))
-                # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                img = Image.fromarray(img)
-                self.img = ImageTk.PhotoImage(image = img)
-
-                self.videoFrame.create_image((0, 0), anchor=NW, image=self.img)
-                # time.sleep(.03)
+                sound = data['payload']
+                self.play(sound)
             except:
                 self.endCall()
-        
+            
         self.SERVER_SOCKET.close()
+        self.stream.close()
+        self.obj.terminate()

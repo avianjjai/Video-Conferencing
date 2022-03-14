@@ -56,7 +56,9 @@ class IDE:
             top_left = Point(x = border['width'], y = border['width']),
             bg = '#784628',
             videoType = 'Camera',
-            CAMERA_PORT = connection['CAMERA_PORT']
+            CAMERA_PORT = connection['CAMERA_PORT'],
+            MIC_PORT = connection['MIC_PORT'],
+            endCall = self.endCall
         )
         self.videoFrame1 = VideoFrame(**videoFrame1)
 
@@ -67,8 +69,10 @@ class IDE:
             top_left = Point(x = videoFrame1['width'] + 2*border['width'], y = border['width']),
             bg = '#784628',
             videoType = 'Video',
-            CALLER_PORT = connection['CALLER_PORT'],
-            CALLER_IP = connection['CALLER_IP']
+            CALLER_CAMERA_PORT = connection['CALLER_CAMERA_PORT'],
+            CALLER_MIC_PORT = connection['CALLER_MIC_PORT'],
+            CALLER_IP = connection['CALLER_IP'],
+            endCall = self.endCall
         )
         self.videoFrame2 = VideoFrame(**videoFrame2)
 
@@ -96,5 +100,12 @@ class IDE:
         self.canvas.pack()
 
     def endCall(self):
-        del self.videoFrame1
-        del self.videoFrame2
+        try:
+            del self.videoFrame1
+        except:
+            pass
+
+        try:
+            del self.videoFrame2
+        except:
+            pass

@@ -1,15 +1,12 @@
-import pickle
-import cv2
-from PIL import Image, ImageTk
-from tkinter import NW
+import pyaudio
 import threading
-import numpy as np
-import time
 import socket
 import struct
+import pickle
+import numpy as np
 
-class Camera(threading.Thread):
-    def __init__(self, videoFrame, SERVER_PORT, endCall) -> None:
+class Mic(threading.Thread):
+    def __init__(self, frame_size, duration, SERVER_PORT, endCall):
         threading.Thread.__init__(self)
         self._stop = threading.Event()
         self.endCall = endCall
@@ -21,20 +18,35 @@ class Camera(threading.Thread):
         self.CALLER_IP = None
         self.CALLER_SOCKET = None
 
-        self.img = None
-        self.videoFrame = videoFrame
-        self.cap = cv2.VideoCapture(0)
-        self.randomImg = None
+        self.duration = duration
+        self.frame_size = frame_size
 
+        attr = dict(
+            format = pyaudio.paInt16,
+            channels = 1,
+            rate = frame_size,
+            input = True,
+            frames_per_buffer = int(frame_size*duration)
+        )
+
+        self.obj = pyaudio.PyAudio()
+        self.stream = self.obj.open(**attr)
 
     def stop(self):
         self._stop.set()
-
+    
     def stopped(self):
         return self._stop.isSet()
 
+    def record(self):
+        nsamples = int(self.duration*self.frame_size)
+        buffer = self.stream.read(nsamples)
+        arr = np.frombuffer(buffer, dtype='int16')
+        return arr
+
     def run(self):
-        self.err = cv2.imread('Image/Network_ISSUE.jpg')
+        print(self.SERVER_IP, self.SERVER_PORT)
+
         try:
             self.SERVER_SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print('Caller Socket Created Successfully')
@@ -57,33 +69,23 @@ class Camera(threading.Thread):
         print('CALLER[PORT] = ', self.CALLER_PORT)
         ######################################################################
 
+
         while self.stopped() == False:
             try:
-                if self.cap.isOpened():
-                    ret, img = self.cap.read()
-                else:
-                    img = self.err
-
-                img = cv2.resize(img, (int(self.videoFrame.cget('width')), int(self.videoFrame.cget('height'))))
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                sound = self.record()
 
                 ###############################################
                 send = pickle.dumps(dict(
                     type = 'Frame',
-                    payload = img
+                    payload = sound
                 ))
+
                 msg_size = struct.pack('L', len(send))
-            
                 self.CALLER_SOCKET.sendall(msg_size + send)
                 ###############################################
-
-                img = Image.fromarray(img)
-                self.img = ImageTk.PhotoImage(image = img)
-
-                self.videoFrame.create_image((0, 0), anchor=NW, image=self.img)
-                # time.sleep(.03)
             except:
                 self.endCall()
-
-        self.cap.release()
+            
         self.SERVER_SOCKET.close()
+        self.stream.close()
+        self.obj.terminate()
