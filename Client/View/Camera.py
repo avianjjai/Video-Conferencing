@@ -36,6 +36,7 @@ class Camera(threading.Thread):
     def run(self):
         # self.err = cv2.imread('Image/Network_ISSUE.jpg')
         try:
+            print('Camera Waiting For Connection')
             self.SERVER_SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print('Caller Socket Created Successfully')
         except socket.error as err:

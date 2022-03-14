@@ -34,7 +34,6 @@ class Video(threading.Thread):
         self.SERVER_SOCKET = socket.socket()
         while True:
             try:
-                print('Connection Request')
                 self.SERVER_SOCKET.connect((self.SERVER_IP, self.SERVER_PORT))
                 break
             except:
