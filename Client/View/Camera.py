@@ -66,7 +66,7 @@ class Camera(threading.Thread):
                     print('Camera Opened')
                     ret, img = self.cap.read()
                 else:
-                    img = self.err
+                    # img = self.err
                     print('Camera Not Opened')
 
                 img = cv2.resize(img, (int(self.videoFrame.cget('width')), int(self.videoFrame.cget('height'))))
