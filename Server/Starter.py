@@ -33,6 +33,7 @@ def main():
     c1_ip = clients[0][1][0]
 
     c2_data = pickle.loads(c2_poi.recv(1024))
+    print(c2_data)
     c2_CAMERA_PORT = c2_data['CAMERA_PORT']
     c2_MIC_PORT = c2_data['MIC_PORT']
     c2_ip = clients[1][1][0]
