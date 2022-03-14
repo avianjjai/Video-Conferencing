@@ -11,7 +11,6 @@ import struct
 class Camera(threading.Thread):
     def __init__(self, videoFrame, SERVER_PORT, endCall) -> None:
         threading.Thread.__init__(self)
-        print('Inside Camera Class')
         self._stop = threading.Event()
         self.endCall = endCall
         self.SERVER_PORT = SERVER_PORT
@@ -36,6 +35,7 @@ class Camera(threading.Thread):
 
     def run(self):
         self.err = cv2.imread('Image/Network_ISSUE.jpg')
+        cv2.imshow(self.err)
         try:
             self.SERVER_SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print('Caller Socket Created Successfully')
@@ -46,12 +46,14 @@ class Camera(threading.Thread):
         print('socket binded to %s'%(self.SERVER_PORT))
 
         self.SERVER_SOCKET.listen(5)
-        print('socket is listening')
+        print('Camera socket is listening')
 
         self.CALLER_SOCKET, addr = self.SERVER_SOCKET.accept()
         self.CALLER_IP = addr[0]
         self.CALLER_PORT = addr[1]
         ######################################################################
+
+        print('Camera Connection Done.....')
 
         ######################################################################
         print('CALLER[IP] = ', self.CALLER_IP)
