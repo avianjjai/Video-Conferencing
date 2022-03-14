@@ -34,8 +34,7 @@ class Camera(threading.Thread):
         return self._stop.isSet()
 
     def run(self):
-        self.err = cv2.imread('Image/Network_ISSUE.jpg')
-        cv2.imshow('test window', self.err)
+        # self.err = cv2.imread('Image/Network_ISSUE.jpg')
         try:
             self.SERVER_SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print('Caller Socket Created Successfully')
