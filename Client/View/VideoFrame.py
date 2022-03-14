@@ -43,6 +43,7 @@ class VideoFrame():
 
 
     def create(self, CAMERA_PORT, CALLER_CAMERA_IP, CALLER_CAMERA_PORT):
+        print(self.videoType)
         if self.videoType == 'Camera':
             return Camera(self.videoFrame, CAMERA_PORT, self.endCall)
 
