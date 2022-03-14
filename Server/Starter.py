@@ -8,8 +8,10 @@ def main():
     except socket.error as err:
         print('Server Socket creation failed with error %s' %(err))
     
-    PORT = 30000
-    server.bind(('', PORT))
+    IP = ''
+    PORT = 4455
+    # server.bind(('', PORT))
+    server.bind((IP, PORT))
     print('socket binded to %s'%(PORT))
 
     server.listen(5)
