@@ -1,0 +1,5 @@
+numpy==1.21.5
+opencv-python==4.5.5.64
+Pillow==9.0.1
+PyAudio==0.2.11
+tk==0.1.0
