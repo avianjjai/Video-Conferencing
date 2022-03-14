@@ -20,6 +20,7 @@ def makeCall(SERVER_IP, SERVER_PORT):
     SERVER_SOCKET.send(send)
 
     recv = pickle.loads(SERVER_SOCKET.recv(1024))
+    print(recv)
     CALLER_CAMERA_PORT = recv['CAMERA_PORT']
     CALLER_MIC_PORT = recv['MIC_PORT']
     CALLER_IP = recv['IP']
