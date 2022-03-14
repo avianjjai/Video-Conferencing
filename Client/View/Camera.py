@@ -57,12 +57,15 @@ class Camera(threading.Thread):
         print('CALLER[PORT] = ', self.CALLER_PORT)
         ######################################################################
 
+        print('Present In Camera')
         while self.stopped() == False:
             try:
                 if self.cap.isOpened():
+                    print('Camera Opened')
                     ret, img = self.cap.read()
                 else:
                     img = self.err
+                    print('Camera Not Opened')
 
                 img = cv2.resize(img, (int(self.videoFrame.cget('width')), int(self.videoFrame.cget('height'))))
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
