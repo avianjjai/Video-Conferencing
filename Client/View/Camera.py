@@ -11,6 +11,7 @@ import struct
 class Camera(threading.Thread):
     def __init__(self, videoFrame, SERVER_PORT, endCall) -> None:
         threading.Thread.__init__(self)
+        print('Inside Camera Class')
         self._stop = threading.Event()
         self.endCall = endCall
         self.SERVER_PORT = SERVER_PORT
