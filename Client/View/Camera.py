@@ -34,9 +34,8 @@ class Camera(threading.Thread):
         return self._stop.isSet()
 
     def run(self):
-        # self.err = cv2.imread('Image/Network_ISSUE.jpg')
+        self.err = cv2.imread('Image/Network_ISSUE.jpg')
         try:
-            print('Camera Waiting For Connection')
             self.SERVER_SOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             print('Caller Socket Created Successfully')
         except socket.error as err:
@@ -64,11 +63,9 @@ class Camera(threading.Thread):
         while self.stopped() == False:
             try:
                 if self.cap.isOpened():
-                    print('Camera Opened')
                     ret, img = self.cap.read()
                 else:
-                    # img = self.err
-                    print('Camera Not Opened')
+                    img = self.err
 
                 img = cv2.resize(img, (int(self.videoFrame.cget('width')), int(self.videoFrame.cget('height'))))
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
